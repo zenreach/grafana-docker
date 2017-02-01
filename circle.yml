@@ -14,10 +14,16 @@ dependencies:
   pre:
     - docker info
     - > 
-      if [ -n "${CREATE_MASTER_IMAGE}" ]; then
-        ./build.sh latest master
+      if [ [ "$GRAFANA_TAG" != "" ] ]; then
+        
+        docker build \
+          --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_${_grafana_version}_amd64.deb \
+          --tag "grafana/grafana:${GRAFANA_TAG}" \
+          --no-cache=true .
+        #docker build --build-arg GRAFANA_VERSION=${_grafana_version} --tag "grafana/grafana:${GRAFANA_TAG}" --no-cache=true .
+        docker tag grafana/grafana:${GRAFANA_TAG} grafana/grafana:latest
       else
-        ./build.sh
+        #./build.sh latest master
       fi
 
 test:
@@ -26,13 +32,13 @@ test:
 
 deployment:
   develop:
-    branch: master
-    owner: grafana
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - >
-        if [ -n "${CREATE_MASTER_IMAGE}" ]; then
-          ./push_to_docker_hub.sh master
+        if [ [ "$GRAFANA_TAG" != "" ] ]; then
+          echo "push! $GRAFANA_TAG" 
+          #docker push grafana/grafana:${GRAFANA_TAG}
+	        #docker push grafana/grafana:latest
         else
-          ./push_to_docker_hub.sh
+          #./push_to_docker_hub.sh
         fi
