@@ -13,6 +13,7 @@ dependencies:
 
   pre:
     - docker info
+    - echo ${GRAFANA_TAG}
     - > 
       if [ "$GRAFANA_TAG" != "" ]; then
         
