@@ -16,10 +16,10 @@ dependencies:
 
   pre:
     - docker info
-    - echo ${GRAFANA_TAG}
+    - echo $GRAFANA_TAG
     - >
       if [ "$GRAFANA_TAG" != "" ]; then
-
+        echo "Building tag ${GRAFANA_TAG}"
         docker build \
           --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_${GRAFANA_VERSION}_amd64.deb \
           --tag "grafana/grafana:${GRAFANA_TAG}" \
@@ -27,6 +27,7 @@ dependencies:
         docker tag grafana/grafana:${GRAFANA_TAG} grafana/grafana:latest
 
       else
+        echo "Building latest for master"
         docker build \
           --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/master/grafana_${GRAFANA_VERSION}_amd64.deb \
           --tag "grafana/grafana:master" \
