@@ -7,6 +7,7 @@ ARG DOWNLOAD_URL
 RUN apt-get update
 RUN apt-get -y --no-install-recommends install libfontconfig curl ca-certificates
 RUN apt-get clean
+RUN echo "Downloading grafana from ${DOWNLOAD_URL}"
 RUN curl ${DOWNLOAD_URL} > /tmp/grafana.deb
 RUN dpkg -i /tmp/grafana.deb
 RUN rm /tmp/grafana.deb
