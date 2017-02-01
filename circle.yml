@@ -6,6 +6,9 @@ machine:
     version: 2.7.3
   services:
     - docker
+  environment:
+    GRAFANA_TAG: ""
+    GRAFANA_VERSION: "latest"
 
 dependencies:
   cache_directories:
@@ -14,14 +17,20 @@ dependencies:
   pre:
     - docker info
     - echo ${GRAFANA_TAG}
-    - > 
+    - >
       if [ "$GRAFANA_TAG" != "" ]; then
-        
+
         docker build \
-          --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_${_grafana_version}_amd64.deb \
+          --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_${GRAFANA_VERSION}_amd64.deb \
           --tag "grafana/grafana:${GRAFANA_TAG}" \
           --no-cache=true .
         docker tag grafana/grafana:${GRAFANA_TAG} grafana/grafana:latest
+
+      else
+        docker build \
+          --build-arg DOWNLOAD_URL=https://s3-us-west-2.amazonaws.com/grafana-releases/master/grafana_${GRAFANA_VERSION}_amd64.deb \
+          --tag "grafana/grafana:master" \
+          --no-cache=true .
       fi
 
 test:
@@ -36,6 +45,8 @@ deployment:
       - >
         if [ "$GRAFANA_TAG" != "" ]; then
           echo "push! ${GRAFANA_TAG}"
+        else
+          echo "push! master"
         fi
 
 
